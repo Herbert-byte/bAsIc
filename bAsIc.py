@@ -10,6 +10,7 @@ By Herbert Kumar
 
 import random
 import re
+from datetime import datetime
 greet = [
     "  _       _        ___     ",
     " | |__   / \\   ___|_ _|___ ",
@@ -28,7 +29,15 @@ query = [
             "/help",
             "/exit",
             "I wish to ask a fibbonaci question",
-            "I wish to use a calculator"
+            "I wish to use a calculator",
+            "What is your name",
+            "Who created you",
+            "What can you do",
+            "Tell me a joke",
+            "What time is it",
+            "Give me a random number",
+            "Compliment me",
+            "Inspire me"
         ]
 
 def normalize(text):
@@ -88,6 +97,38 @@ while True:
         elif index == 7:
             expr = input("Enter a calculation (for example: 2 + 2 * 3) - ")
             print("Result:", calculate(expr))
+        elif index == 8:
+            print("My name is bAsIc.")
+        elif index == 9:
+            print("I was created by Herbert Kumar.")
+        elif index == 10:
+            print("I can chat with you, calculate expressions, and generate Fibonacci sequences.")
+        elif index == 11:
+            jokes = [
+                "Why did the computer show up at work late? It had a hard drive.",
+                "There are 10 kinds of people in the world: those who understand binary and those who don't.",
+                "I would tell you a UDP joke, but you might not get it."
+            ]
+            print(random.choice(jokes))
+        elif index == 12:
+            now = datetime.now().strftime("%H:%M:%S")
+            print("The current time is", now)
+        elif index == 13:
+            print("Here is a random number between 1 and 100:", random.randint(1, 100))
+        elif index == 14:
+            compliments = [
+                "You are doing great!",
+                "You are smarter than you think.",
+                "The world is better with you in it, " + name + "."
+            ]
+            print(random.choice(compliments))
+        elif index == 15:
+            quotes = [
+                "Keep going, you are closer than you think.",
+                "Every expert was once a beginner.",
+                "Small steps every day lead to big change."
+            ]
+            print(random.choice(quotes))
     elif userask_normalized == "exit":
         print("Use /exit next time. Bye!")
         break

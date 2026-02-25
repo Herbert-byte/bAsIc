@@ -1,6 +1,26 @@
-## bAsIc
+<div align="center">
 
-A very simple, terminal-based AI chatbot that can respond to a small set of predefined questions, generate Fibonacci sequences, and evaluate basic calculator expressions.
+<pre>
+ _       _        ___
+| |__   / \   ___|_ _|___
+| '_ \ / _ \ / __|| |/ __|
+| |_) / ___ \\__ \| | (__
+|_.__/_/   \_\___/___\___|
+</pre>
+
+**bAsIc**  
+A basic AI that can answer some basic questions.
+
+</div>
+
+---
+
+### Overview
+
+`bAsIc` is a very simple, terminal-based AI chatbot.  
+It can respond to a **small set of predefined questions**, generate **Fibonacci sequences**, and evaluate **basic calculator expressions**.
+
+Originally created by **Herbert Kumar** as a tiny experiment in building a “basic AI”.
 
 ### Features
 
@@ -8,6 +28,7 @@ A very simple, terminal-based AI chatbot that can respond to a small set of pred
 - **Fibonacci helper**: Generates the first \(n\) Fibonacci numbers on request.
 - **Calculator**: Evaluates basic math expressions like `2 + 2 * 3`.
 - **Friendly greeting**: ASCII-art banner and name prompt when you start the program.
+- **Input normalization**: Ignores case and most punctuation so you don’t have to type questions perfectly.
 
 ### Requirements
 
@@ -23,26 +44,52 @@ A very simple, terminal-based AI chatbot that can respond to a small set of pred
    cd bAsIc
    ```
 
-2. **Run the program**
+2. **(Optional) Create a virtual environment**
+
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
+
+3. **Run the program**
 
    ```bash
    python bAsIc.py
    ```
 
-3. **Interact**
+You should see the ASCII-art logo, then be prompted for your name, followed by:
 
-   When prompted, you can ask questions like:
+> `Hello There, I am an bAsIc.`
 
-   - `How are you`
-   - `What are you doing`
-   - `What do you think about right now`
-   - `What to ask?`
-   - `/help`
-   - `/exit`
-   - `I wish to ask a fibbonaci question`
-   - `I wish to use a calculator`
+### How to talk to bAsIc
 
-   The program normalizes your input, so capitalization and punctuation do not matter much.
+After the greeting, you can type questions or commands.  
+Some examples it understands:
+
+- `How are you`
+- `What are you doing`
+- `What do you think about right now`
+- `What to ask?`
+- `/help`
+- `/exit`
+- `I wish to ask a fibbonaci question`
+- `I wish to use a calculator`
+
+Because input is normalized, variations in case and most punctuation are fine.
+
+### Special modes
+
+- **Fibonacci mode**
+  - Type: `I wish to ask a fibbonaci question`
+  - Then enter how many Fibonacci numbers you want:
+    - Example: `5` → outputs `[0, 1, 1, 2, 3]`
+
+- **Calculator mode**
+  - Type: `I wish to use a calculator`
+  - Then enter a math expression:
+    - Example: `2 + 2 * 3` → outputs `Result: 8`
+
+> Note: The calculator uses Python’s expression rules and is intentionally simple.
 
 ### Project Structure
 

@@ -11,6 +11,10 @@ By Herbert Kumar
 import random
 import re
 from datetime import datetime
+from colorama import Fore, Style, init
+
+init(autoreset=True)
+
 greet = [
     "  _       _        ___     ",
     " | |__   / \\   ___|_ _|___ ",
@@ -19,7 +23,8 @@ greet = [
     " |_.__/_/   \\_\\___|___\\___|"
 ]
 for line in greet:
-    print(line)
+    print(Fore.CYAN + line)
+print(Style.RESET_ALL, end="")
 
 query = [
             "How are you",
@@ -47,9 +52,9 @@ def normalize(text):
 
 query_normalized = [normalize(q) for q in query]
 
-print("Hello There, I am an bAsIc.")
+print(Fore.GREEN + "Hello There, I am an bAsIc." + Style.RESET_ALL)
 name = str(input("What's your name? - "))
-print("Ok. Your name is", name)
+print(Fore.GREEN + "Ok. Your name is " + name + Style.RESET_ALL)
 
 
 def calculate(expression):
@@ -79,59 +84,60 @@ while True:
     if userask_normalized in query_normalized:
         index = query_normalized.index(userask_normalized)
         if index == 0:
-            print("I am doing good, thanks for asking. 🤗")
+            print(Fore.LIGHTBLUE_EX + "I am doing good, thanks for asking. 🤗" + Style.RESET_ALL)
         elif index == 1:
-            print("I am chatting with you. 💬")
+            print(Fore.LIGHTBLUE_EX + "I am chatting with you. 💬" + Style.RESET_ALL)
         elif index == 2:
-            print("I am thinking about how to make a better AI than me. 💭")
+            print(Fore.LIGHTBLUE_EX + "I am thinking about how to make a better AI than me. 💭" + Style.RESET_ALL)
         elif index == 3:
-            print("Say something like", query)
+            print(Fore.LIGHTBLUE_EX + "Say something like " + str(query) + Style.RESET_ALL)
         elif index == 4:
-            print("You can ask me things like", query)
+            print(Fore.LIGHTBLUE_EX + "You can ask me things like " + str(query) + Style.RESET_ALL)
         elif index == 5:
-            print("Goodbye!")
+            print(Fore.YELLOW + "Goodbye!" + Style.RESET_ALL)
             break
         elif index == 6:
             user_fib = int(input("Enter the number of Fibonacci numbers to generate: "))
-            print(fibonacci(user_fib))
+            print(Fore.LIGHTBLUE_EX + str(fibonacci(user_fib)) + Style.RESET_ALL)
         elif index == 7:
             expr = input("Enter a calculation (for example: 2 + 2 * 3) - ")
-            print("Result:", calculate(expr))
+            print(Fore.LIGHTBLUE_EX + "Result: " + str(calculate(expr)) + Style.RESET_ALL)
         elif index == 8:
-            print("My name is bAsIc.")
+            print(Fore.LIGHTBLUE_EX + "My name is bAsIc." + Style.RESET_ALL)
         elif index == 9:
-            print("I was created by Herbert Kumar.")
+            print(Fore.LIGHTBLUE_EX + "I was created by Herbert Kumar." + Style.RESET_ALL)
         elif index == 10:
-            print("I can chat with you, calculate expressions, and generate Fibonacci sequences.")
+            print(Fore.LIGHTBLUE_EX + "I can chat with you, calculate expressions, and generate Fibonacci sequences." + Style.RESET_ALL)
         elif index == 11:
             jokes = [
                 "Why did the computer show up at work late? It had a hard drive.",
                 "There are 10 kinds of people in the world: those who understand binary and those who don't.",
                 "I would tell you a UDP joke, but you might not get it."
             ]
-            print(random.choice(jokes))
+            print(Fore.LIGHTBLUE_EX + random.choice(jokes) + Style.RESET_ALL)
         elif index == 12:
             now = datetime.now().strftime("%H:%M:%S")
-            print("The current time is", now)
+            print(Fore.LIGHTBLUE_EX + "The current time is " + now + Style.RESET_ALL)
         elif index == 13:
-            print("Here is a random number between 1 and 100:", random.randint(1, 100))
+            n = random.randint(1, 100)
+            print(Fore.LIGHTBLUE_EX + "Here is a random number between 1 and 100: " + str(n) + Style.RESET_ALL)
         elif index == 14:
             compliments = [
                 "You are doing great!",
                 "You are smarter than you think.",
                 "The world is better with you in it, " + name + "."
             ]
-            print(random.choice(compliments))
+            print(Fore.LIGHTBLUE_EX + random.choice(compliments) + Style.RESET_ALL)
         elif index == 15:
             quotes = [
                 "Keep going, you are closer than you think.",
                 "Every expert was once a beginner.",
                 "Small steps every day lead to big change."
             ]
-            print(random.choice(quotes))
+            print(Fore.LIGHTBLUE_EX + random.choice(quotes) + Style.RESET_ALL)
     elif userask_normalized == "exit":
-        print("Use /exit next time. Bye!")
+        print(Fore.YELLOW + "Use /exit next time. Bye!" + Style.RESET_ALL)
         break
     else:
-        print("I don't understand that question.")
-        print("Say something like -", random.choice(query))
+        print(Fore.RED + "I don't understand that question." + Style.RESET_ALL)
+        print(Fore.RED + "Say something like - " + str(random.choice(query)) + Style.RESET_ALL)

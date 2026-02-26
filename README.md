@@ -33,14 +33,20 @@ Originally created by **Herbert Kumar** as a tiny experiment in building a “ba
 ### Requirements
 
 - **Python**: 3.8 or newer
-- **Dependencies**: Only uses the Python standard library (`random`, `re`). No extra packages required.
+- **Dependencies**: Colorama, Python Standard Library('random', 're') [*The libs are already installed by default*]
+
+#### To install colorama -
+
+```bash
+pip install colorama -U # Make sure that your python client or cli is in PATH.
+```
 
 ### Getting Started
 
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/<your-username>/bAsIc.git
+   git clone https://github.com/Herbert-byte/bAsIc.git
    cd bAsIc
    ```
 
@@ -105,6 +111,5 @@ Pull requests are welcome! Some ideas:
 - Improve error handling around user input.
 - Turn this into an installable package with a CLI entrypoint.
 
-### License
-
-Choose a license (for example MIT) and add it as `LICENSE` at the project root.
+### LICENSE
+The license is not introduced yet, we are choosing the MIT License soon.

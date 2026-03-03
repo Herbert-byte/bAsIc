@@ -112,4 +112,4 @@ Pull requests are welcome! Some ideas:
 - Turn this into an installable package with a CLI entrypoint.
 
 ### LICENSE
-The license is not introduced yet, we are choosing the MIT License soon.
+The MIT License has been adopted in this project. Check [LICENSE](https://github.com/Herbert-byte/bAsIc/blob/main/LICENSE) for more details.

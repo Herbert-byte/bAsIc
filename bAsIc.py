@@ -5,7 +5,7 @@ r"""
 | |_) / ___ \\__ \| | (__
 |_.__/_/   \_\___/___\___|
 A basic AI that can answer some basic questions. It is only allowed to be asked few questions that are specific.
-By Herbert Kumar
+By Herbert Kumar (y3ll0what_, whitespc_)
 """
 
 import random

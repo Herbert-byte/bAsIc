@@ -71,7 +71,6 @@ set_of_purpose = [
     "what is your purpose",
     "who is this",
     "help pls",
-    "what can you do",
     "What kind of AI are you?",
     "Introduce yourself",
 ]

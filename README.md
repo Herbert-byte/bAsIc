@@ -33,13 +33,7 @@ Originally created by **Herbert Kumar** as a tiny experiment in building a “ba
 ### Requirements
 
 - **Python**: 3.8 or newer
-- **Dependencies**: Colorama, Python Standard Library('random', 're') [*The libs are already installed by default*]
-
-#### To install colorama -
-
-```bash
-pip install colorama -U # Make sure that your python client or cli is in PATH.
-```
+- **Dependencies**: Python Standard Library('random', 're') [*The libs are already installed by default*]
 
 ### Getting Started
 

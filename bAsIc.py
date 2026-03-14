@@ -265,21 +265,21 @@ def main():
             break
         if contains_any(userask_normalized, symbols_to_check):
             manual_calculator_mode()
-        elif contains_any(userask_normalized, normalized_set_of_questions):
-            print("I am great, I hope you are too!")
-        elif contains_any(userask_normalized, normalized_set_of_greetings):
-            print("Hello! I'm here to help.")
-        elif contains_any(userask_normalized, normalized_set_of_purpose):
-            print("I am bAsIc, an AI that answers questions, has basic conversations, and calculates answers.")
-        elif contains_any(userask_normalized, normalized_set_of_questions2):
-            print("Ask whatever you want! If you need help, type 'help pls'.")
-        elif contains_any(userask_normalized, normalized_set_of_questions3):
-            print("By being dedicated and working hard.")
         elif contains_any(userask_normalized, normalized_tango_mangle_keywords):
             for _ in range(7):
                 print("Do you want a free chicken nugget")
             print("continued to infinity")
             print(YELLOW + "You found a secret and got tangomangled lol" + RESET)
+        elif contains_any(userask_normalized, normalized_set_of_questions2):
+            print("Ask whatever you want! If you need help, type 'help pls'.")
+        elif contains_any(userask_normalized, normalized_set_of_questions3):
+            print("By being dedicated and working hard.")
+        elif contains_any(userask_normalized, normalized_set_of_questions):
+            print("I am great, I hope you are too!")
+        elif contains_any(userask_normalized, normalized_set_of_greetings):
+            print("Hello! I'm here to help.")
+        elif contains_any(userask_normalized, normalized_set_of_purpose):
+            print("I am bAsIc, an AI that answers questions, has basic conversations, and calculates answers.") 
         elif contains_any(userask_normalized, normalized_set_of_capabilities):
             print("My core strengths are basic communication, giving fibonacci, and answering basic arithmetic equations questions.")
         elif contains_any(userask_normalized, normalized_set_of_feedbackP):

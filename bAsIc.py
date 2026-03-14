@@ -55,11 +55,31 @@ def normalize(text):
 def contains_any(text, symbols):
     """Return True if any string in symbols appears in text.
 
-    Matching is case-insensitive and works correctly whether `text` is
-    normalized (lowercased/punctuation-stripped) or raw user input.
+    For human-friendly keyword matching, this performs word/phrase matching
+    rather than raw substring matching. This avoids false positives like
+    "how are you" matching the greeting keyword "yo".
+
+    For non-word symbols (e.g. "+", "-"), it falls back to simple substring
+    matching.
     """
     text_lower = text.lower()
-    return any(s.lower() in text_lower for s in symbols)
+
+    for s in symbols:
+        keyword = s.lower().strip()
+        if not keyword:
+            continue
+
+        # Use whole-word matching for alpha/space keywords to avoid substrings like
+        # "yo" matching "you".
+        if re.match(r"^[\w\s]+$", keyword):
+            pattern = r"\b" + re.escape(keyword) + r"\b"
+            if re.search(pattern, text_lower):
+                return True
+        else:
+            if keyword in text_lower:
+                return True
+
+    return False
 
 
 symbols_to_check = ["/", "*", "-", "+", "multiply", "divide", "add", "subtract", "plus", "minus"]

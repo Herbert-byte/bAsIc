@@ -80,6 +80,7 @@ set_of_questions2 = ["what should i ask you?", "i need help", "how to use"]
 set_of_questions3 = ["how can i win", "how to succed", "how can i do good in life"]
 tango_mangle_keywords = ["tangomangle", "do you want a free chicken nugget"]
 set_of_capabilities = ["What are you best at?","What should I use you for?","Give me some use cases for this AI","Why would I use you instead of a search engine?","Show me your skill set"]
+set_of_feedback = ["ok","sure","nice","you are very good"]
 
 # Normalized versions of several keyword sets.
 # These are used for case-insensitive (and punctuation-insensitive) matching.
@@ -90,7 +91,7 @@ normalized_set_of_questions2 = [normalize(s) for s in set_of_questions2]
 normalized_set_of_questions3 = [normalize(s) for s in set_of_questions3]
 normalized_tango_mangle_keywords = [normalize(s) for s in tango_mangle_keywords]
 normalized_set_of_capabilities = [normalize(s) for s in set_of_capabilities]
-
+normalized_set_of_feedback = [normalize(s) for s in set_of_feedback]
 
 def unique_preserve_order(items):
     seen = set()
@@ -271,6 +272,8 @@ def main():
             print(YELLOW + "You found a secret and got tangomangled lol" + RESET)
         elif contains_any(userask_normalized, normalized_set_of_capabilities):
             print("My core strengths are basic communication, giving fibonacci, and answering basic arithmatic equations questions.")
+         elif contains_any(userask_normalized, normalized_set_of_feedback):
+            print(":), I am happy to help.")
         else:
             print(RED + "I'm not sure how to do that yet, but I'm listening!" + RESET)
 

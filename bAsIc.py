@@ -80,7 +80,7 @@ set_of_questions = ["how are you?", "you good?", "are you well?"]
 set_of_questions2 = ["what should i ask you?", "i need help", "how to use"]
 set_of_questions3 = ["how can i win", "how to succed", "how can i do good in life"]
 tango_mangle_keywords = ["tangomangle", "do you want a free chicken nugget"]
-set_of_capabilities = ["What are you best at?","What should I use you for?","Give me some use cases for this AI","Why would I use you instead of a search engine?","Show me your skill set."]
+set_of_capabilities = ["What are you best at?","What should I use you for?","Give me some use cases for this AI","Why would I use you instead of a search engine?","Show me your skill set"]
 
 # Normalized versions of several keyword sets.
 # These are used for case-insensitive (and punctuation-insensitive) matching.

@@ -5,7 +5,7 @@ r"""
 | |_) / ___ \\__ \| | (__
 |_.__/_/   \_\___/___\___|
 A basic AI that can answer some basic questions. It is only allowed to be asked a few specific questions.
-By Herbert Kumar (y3ll0what_, whitespc_)
+By Herbert Kumar & Akshaj Tiwari(y3ll0what_, whitespc_,Aks-pro171Git)
 """
 
 import random
@@ -68,12 +68,16 @@ set_of_purpose = [
     "who is this",
     "help pls",
     "what can you do",
+    "What kind of AI are you?",
+    "Introduce yourself",
 ]
 set_of_greetings = ["hi", "hello", "whats up?", "whats up", "yo!", "hey"]
 set_of_questions = ["how are you?", "you good?", "are you well?"]
 set_of_questions2 = ["what should i ask?", "i need help", "how to use"]
 set_of_questions3 = ["how can i win", "how to succed", "how can i do good in life"]
 tango_mangle_keywords = ["tangomangle", "do you want a free chicken nugget"]
+set_of_capabilities = ["What are you best at?","What should I use you for?","Give me some use cases for this AI","Why would I use you instead of a search engine?","Show me your skill set."]
+
 
 
 def unique_preserve_order(items):
@@ -253,6 +257,8 @@ def main():
                 print("Do you want a free chicken nugget")
             print("continued to infinity")
             print(YELLOW + "You found a secret and got tangomangled lol" + RESET)
+         elif contains_any(userask, set_of_cababilities):
+            print("My core strengths are basic communicationt, giving fibonacci, and answering basic arithmatic equations questions.")
         else:
             print(RED + "I'm not sure how to do that yet, but I'm listening!" + RESET)
 

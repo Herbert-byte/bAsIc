@@ -258,8 +258,8 @@ def main():
                 print("Do you want a free chicken nugget")
             print("continued to infinity")
             print(YELLOW + "You found a secret and got tangomangled lol" + RESET)
-         elif contains_any(userask, set_of_cababilities):
-            print("My core strengths are basic communicationt, giving fibonacci, and answering basic arithmatic equations questions.")
+         elif contains_any(userask, set_of_capabilities):
+            print("My core strengths are basic communication, giving fibonacci, and answering basic arithmatic equations questions.")
         else:
             print(RED + "I'm not sure how to do that yet, but I'm listening!" + RESET)
 

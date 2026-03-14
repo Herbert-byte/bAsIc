@@ -101,6 +101,7 @@ query = unique_preserve_order(
     + set_of_questions
     + set_of_questions2
     + set_of_questions3
+    + set_of_capabilities
     # Avoid math operators that normalize to "" (e.g. "+", "*")
     + [s for s in symbols_to_check if normalize(s)]
 )

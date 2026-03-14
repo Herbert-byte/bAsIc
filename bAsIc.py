@@ -53,7 +53,11 @@ def normalize(text):
 
 
 def contains_any(text, symbols):
-    """Return True if any string in symbols appears in text (case-insensitive)."""
+    """Return True if any string in symbols appears in text.
+
+    Matching is case-insensitive and works correctly whether `text` is
+    normalized (lowercased/punctuation-stripped) or raw user input.
+    """
     text_lower = text.lower()
     return any(s.lower() in text_lower for s in symbols)
 
@@ -250,7 +254,7 @@ def main():
         if userask_normalized == "exit":
             print(YELLOW + "Use /exit next time. Bye!" + RESET)
             break
-        if contains_any(userask, symbols_to_check):
+        if contains_any(userask_normalized, symbols_to_check):
             manual_calculator_mode()
         elif contains_any(userask_normalized, normalized_set_of_questions):
             print("I am great, I hope you are too!")

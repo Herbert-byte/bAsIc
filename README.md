@@ -20,7 +20,7 @@ A basic AI that can answer some basic questions.
 `bAsIc` is a very simple, terminal-based AI chatbot.  
 It can respond to a **small set of predefined questions**, generate **Fibonacci sequences**, and evaluate **basic calculator expressions**.
 
-Originally created by **Herbert Kumar** as a tiny experiment in building a “basic AI”.
+Originally created by **Herbert Kumar** as a tiny experiment in building a “basic AI”. Improved by Akshaj Tiwari (Aks-pro171).
 
 ### Features
 

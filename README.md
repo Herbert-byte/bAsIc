@@ -64,7 +64,9 @@ You should see the ASCII-art logo, then be prompted for your name, followed by:
 ### How to talk to bAsIc
 
 After the greeting, you can type questions or commands.  
-Some examples it understands:
+The bot understands a **fixed set of phrases**, plus some special tokens for calculator mode.
+
+#### Common questions / commands
 
 - `How are you`
 - `What are you doing`
@@ -72,8 +74,54 @@ Some examples it understands:
 - `What to ask?`
 - `/help`
 - `/exit`
-- `I wish to ask a fibbonaci question`
+- `I wish to ask a Fibonacci question`
 - `I wish to use a calculator`
+- `What is your name`
+- `Who created you`
+- `What can you do`
+- `Tell me a joke`
+- `What time is it`
+- `Give me a random number`
+- `Compliment me`
+- `Inspire me`
+
+#### Introductions / purpose
+
+- `who are you`
+- `what are you`
+- `what do you do`
+- `tell me about yourself`
+- `what is your purpose`
+- `who is this`
+- `help pls`
+- `What kind of AI are you?`
+- `Introduce yourself`
+
+#### Greetings
+
+- `hi`
+- `hello`
+- `whats up?`
+- `yo!`
+- `hey`
+
+#### Help / advice questions
+
+- `how can i get help`
+- `i need help`
+- `help me`
+- `what should i do?`
+- `how can i win`
+- `how to succeed`
+- `how can i do good in life`
+
+#### Calculator triggers
+
+The bot will also enter a small calculator mode if your input contains any of these tokens:
+
+- `/` (slash)
+- `*`, `-`, `+`
+- `multiply`, `divide`, `add`, `subtract`, `plus`, `minus`
 
 Because input is normalized, variations in case and most punctuation are fine.
 

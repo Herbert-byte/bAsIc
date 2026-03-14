@@ -89,6 +89,7 @@ set_of_capabilities = [
     "what are your strengths",
     "what are you good at",
 ]
+set_of_feedbackP = ["ok","sure","wow","you are good","you are so good",]
 tango_mangle_keywords = ["tangomangle", "do you want a free chicken nugget"]
 
 # Normalized versions of several keyword sets.
@@ -100,7 +101,7 @@ normalized_set_of_questions2 = [normalize(s) for s in set_of_questions2]
 normalized_set_of_questions3 = [normalize(s) for s in set_of_questions3]
 normalized_tango_mangle_keywords = [normalize(s) for s in tango_mangle_keywords]
 normalized_set_of_capabilities = [normalize(s) for s in set_of_capabilities]
-
+normalized_set_of_feedbackP = [normalize(s) for s in set_of_feedbackP]
 
 def unique_preserve_order(items):
     seen = set()
@@ -281,6 +282,8 @@ def main():
             print(YELLOW + "You found a secret and got tangomangled lol" + RESET)
         elif contains_any(userask_normalized, normalized_set_of_capabilities):
             print("My core strengths are basic communication, giving fibonacci, and answering basic arithmetic equations questions.")
+        elif contains_any(userask_normalized, normalized_set_of_feedbackP):
+            print(":), I am happy to help.")
         else:
             print(RED + "I'm not sure how to do that yet, but I'm listening!" + RESET)
 

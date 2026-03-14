@@ -1,2 +1,1 @@
-colorama
-# Python Standard Library
+# Python standard library only; no external dependencies.

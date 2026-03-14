@@ -78,6 +78,15 @@ set_of_questions3 = ["how can i win", "how to succed", "how can i do good in lif
 tango_mangle_keywords = ["tangomangle", "do you want a free chicken nugget"]
 set_of_capabilities = ["What are you best at?","What should I use you for?","Give me some use cases for this AI","Why would I use you instead of a search engine?","Show me your skill set."]
 
+# Normalized versions of several keyword sets.
+# These are used for case-insensitive (and punctuation-insensitive) matching.
+normalized_set_of_purpose = [normalize(s) for s in set_of_purpose]
+normalized_set_of_greetings = [normalize(s) for s in set_of_greetings]
+normalized_set_of_questions = [normalize(s) for s in set_of_questions]
+normalized_set_of_questions2 = [normalize(s) for s in set_of_questions2]
+normalized_set_of_questions3 = [normalize(s) for s in set_of_questions3]
+normalized_tango_mangle_keywords = [normalize(s) for s in tango_mangle_keywords]
+normalized_set_of_capabilities = [normalize(s) for s in set_of_capabilities]
 
 
 def unique_preserve_order(items):
@@ -243,22 +252,22 @@ def main():
             break
         if contains_any(userask, symbols_to_check):
             manual_calculator_mode()
-        elif contains_any(userask, set_of_questions):
+        elif contains_any(userask_normalized, normalized_set_of_questions):
             print("I am great, I hope you are too!")
-        elif contains_any(userask, set_of_greetings):
+        elif contains_any(userask_normalized, normalized_set_of_greetings):
             print("Hello! I'm here to help.")
-        elif contains_any(userask, set_of_purpose):
+        elif contains_any(userask_normalized, normalized_set_of_purpose):
             print("I am bAsIc, an AI that answers questions, has basic conversations, and calculates answers.")
-        elif contains_any(userask, set_of_questions2):
+        elif contains_any(userask_normalized, normalized_set_of_questions2):
             print("Ask whatever you want! If you need help, type 'help pls'.")
-        elif contains_any(userask, set_of_questions3):
+        elif contains_any(userask_normalized, normalized_set_of_questions3):
             print("By being dedicated and working hard.")
-        elif contains_any(userask, tango_mangle_keywords):
+        elif contains_any(userask_normalized, normalized_tango_mangle_keywords):
             for _ in range(7):
                 print("Do you want a free chicken nugget")
             print("continued to infinity")
             print(YELLOW + "You found a secret and got tangomangled lol" + RESET)
-        elif contains_any(userask, set_of_capabilities):
+        elif contains_any(userask_normalized, normalized_set_of_capabilities):
             print("My core strengths are basic communication, giving fibonacci, and answering basic arithmatic equations questions.")
         else:
             print(RED + "I'm not sure how to do that yet, but I'm listening!" + RESET)

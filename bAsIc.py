@@ -46,7 +46,7 @@ def contains_any(text, symbols):
     return False
 
 # --- Original Statement Sets ---
-symbols_to_check = ["/", "*", "-", "+", "multiply", "divide", "add", "subtract", "plus", "minus","arithmatics","calculaor"]
+symbols_to_check = ["/", "*", "-", "+", "multiply", "divide", "add", "subtract", "plus", "minus","arithmetics","calculaor","arithmetic"]
 set_of_purpose = ["who are you", "what are you", "what do you do", "tell me about yourself", "what is your purpose", "who is this", "help pls", "What kind of AI are you?", "Introduce yourself"]
 set_of_greetings = ["hi", "hello", "whats up?", "whats up", "yo!", "hey"]
 set_of_questions = ["how are you?", "you good?", "are you well?"]

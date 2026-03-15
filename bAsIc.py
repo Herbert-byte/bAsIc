@@ -73,6 +73,7 @@ set_of_capabilities = ["what can you do", "what are your capabilities", "what ar
 set_of_feedbackP = ["ok","sure","wow","you are good","you are so good","Yes"]
 set_of_feedbackN = ["no","nah","bruh","you are bad","you are so bad","eww","No"]
 tango_mangle_keywords = ["tangomangle", "do you want a free chicken nugget"]
+kick_out_words = ["fuck","motherfucker","matharchod","bitch","dick","lauda","maa ki"]
 
 normalized_set_of_purpose = [normalize(s) for s in set_of_purpose]
 normalized_set_of_greetings = [normalize(s) for s in set_of_greetings]
@@ -83,6 +84,8 @@ normalized_tango_mangle_keywords = [normalize(s) for s in tango_mangle_keywords]
 normalized_set_of_capabilities = [normalize(s) for s in set_of_capabilities]
 normalized_set_of_feedbackP = [normalize(s) for s in set_of_feedbackP]
 normalized_set_of_feedbackN = [normalize(s) for s in set_of_feedbackN]
+normalized_kick_out_words = [normalize(s) for s in kick_out_words ]
+
 
 def unique_preserve_order(items):
     seen = set()
@@ -217,6 +220,10 @@ def main():
             print(":), I am happy to help.")
         elif contains_any(userask_normalized, normalized_set_of_feedbackN):
             print(":(, sorry, I am just trying to help.")
+        elif contains_any(userask_normalized, normalized_kick_out_words):
+            print(YELLOW + ":(, Very rude and unapropriate, initiating kick out")
+            print(RED + "Initiating kick out")
+            break
         else:
             print(RED + "I'm not sure how to do that yet, but I'm listening!" + RESET)
 

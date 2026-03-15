@@ -1,18 +1,8 @@
-r"""
- _       _        ___
-| |__   / \   ___|_ _|___
-| '_ \ / _ \ / __|| |/ __|
-| |_) / ___ \\__ \| | (__
-|_.__/_/   \_\___/___\___|
-A basic AI that can answer some basic questions. It is only allowed to be asked a few specific questions.
-By Herbert Kumar (y3ll0what_, whitespc_) & Akshaj Tiwari (Aks-pro171Git)
-"""
-
 import random
 import re
 from datetime import datetime
 
-# ANSI color codes (no external dependencies)
+# ANSI color codes
 RED = "\033[31m"
 GREEN = "\033[32m"
 YELLOW = "\033[33m"
@@ -48,74 +38,42 @@ BASE_QUERY = [
 ]
 
 def normalize(text):
-    cleaned = re.sub(r"[^\w\s/]", "", text)
+    # FIX: Included +, -, and * in the allowed characters so they aren't stripped
+    cleaned = re.sub(r"[^\w\s/+\-*]", "", text)
     return cleaned.strip().lower()
 
-
 def contains_any(text, symbols):
-    """Return True if any string in symbols appears in text.
-
-    For human-friendly keyword matching, this performs word/phrase matching
-    rather than raw substring matching. This avoids false positives like
-    "how are you" matching the greeting keyword "yo".
-
-    For non-word symbols (e.g. "+", "-"), it falls back to simple substring
-    matching.
-    """
+    """Enhanced to detect raw math symbols even without spaces."""
     text_lower = text.lower()
-
     for s in symbols:
         keyword = s.lower().strip()
         if not keyword:
             continue
 
-        # Use whole-word matching for alpha/space keywords to avoid substrings like
-        # "yo" matching "you".
-        if re.match(r"^[\w\s]+$", keyword):
+        # FIX: Direct check for math operators to catch "2+2" style input
+        if keyword in ["+", "-", "*", "/"]:
+            if keyword in text_lower:
+                return True
+        elif re.match(r"^[\w\s]+$", keyword):
             pattern = r"\b" + re.escape(keyword) + r"\b"
             if re.search(pattern, text_lower):
                 return True
         else:
             if keyword in text_lower:
                 return True
-
     return False
 
-
 symbols_to_check = ["/", "*", "-", "+", "multiply", "divide", "add", "subtract", "plus", "minus"]
-set_of_purpose = [
-    "who are you",
-    "what are you",
-    "what do you do",
-    "tell me about yourself",
-    "what is your purpose",
-    "who is this",
-    "help pls",
-    "What kind of AI are you?",
-    "Introduce yourself",
-]
+set_of_purpose = ["who are you", "what are you", "what do you do", "tell me about yourself", "what is your purpose", "who is this", "help pls", "What kind of AI are you?", "Introduce yourself"]
 set_of_greetings = ["hi", "hello", "whats up?", "whats up", "yo!", "hey"]
 set_of_questions = ["how are you?", "you good?", "are you well?"]
-set_of_questions2 = [
-    "how can i get help",
-    "i need help",
-    "help me",
-    "what should i do?",
-    "what can i ask?",
-]
+set_of_questions2 = ["how can i get help", "i need help", "help me", "what should i do?", "what can i ask?"]
 set_of_questions3 = ["how can i win", "how to succeed", "how can i do good in life"]
-set_of_capabilities = [
-    "what can you do",
-    "what are your capabilities",
-    "what are your strengths",
-    "what are you good at",
-]
+set_of_capabilities = ["what can you do", "what are your capabilities", "what are your strengths", "what are you good at"]
 set_of_feedbackP = ["ok","sure","wow","you are good","you are so good","Yes"]
 set_of_feedbackN = ["no","nah","bruh","you are bad","you are so bad","eww","No"]
 tango_mangle_keywords = ["tangomangle", "do you want a free chicken nugget"]
 
-# Normalized versions of several keyword sets.
-# These are used for case-insensitive (and punctuation-insensitive) matching.
 normalized_set_of_purpose = [normalize(s) for s in set_of_purpose]
 normalized_set_of_greetings = [normalize(s) for s in set_of_greetings]
 normalized_set_of_questions = [normalize(s) for s in set_of_questions]
@@ -131,48 +89,31 @@ def unique_preserve_order(items):
     out = []
     for item in items:
         key = normalize(item)
-        if not key:
-            continue
-        if key in seen:
-            continue
+        if not key: continue
+        if key in seen: continue
         seen.add(key)
         out.append(item)
     return out
 
-
-query = unique_preserve_order(
-    BASE_QUERY
-    + set_of_purpose
-    + set_of_greetings
-    + set_of_questions
-    + set_of_questions2
-    + set_of_questions3
-    # Avoid math operators that normalize to "" (e.g. "+", "*")
-    + [s for s in symbols_to_check if normalize(s)]
-)
-
+query = unique_preserve_order(BASE_QUERY + set_of_purpose + set_of_greetings + set_of_questions + set_of_questions2 + set_of_questions3 + [s for s in symbols_to_check if normalize(s)])
 query_normalized = {normalize(q) for q in query}
 
 def calculate(expression):
     try:
+        # Basic cleanup for eval
         result = eval(expression, {"__builtins__": None}, {})
         return result
     except Exception:
         return "I could not understand that calculation."
 
-
 def fibonacci(n):
-    if n <= 0:
-        return []
-    elif n == 1:
-        return [0]
-    elif n == 2:
-        return [0, 1]
+    if n <= 0: return []
+    elif n == 1: return [0]
+    elif n == 2: return [0, 1]
     else:
         seq = [0, 1]
         for i in range(2, n):
-            next_value = seq[i-1] + seq[i-2]
-            seq.append(next_value)
+            seq.append(seq[i-1] + seq[i-2])
         return seq
 
 def print_banner():
@@ -180,11 +121,9 @@ def print_banner():
         print(CYAN + line)
     print(RESET, end="")
 
-
 def manual_calculator_mode():
     choice = input("Action triggered: Go to calculator mode? (yes/no): ").strip().lower()
-    if choice != "yes":
-        return
+    if choice != "yes": return
 
     try:
         num1 = int(input("Enter the first number: "))
@@ -193,66 +132,36 @@ def manual_calculator_mode():
         print("Error: Please enter numbers only!")
         return
 
-    op = input("Enter operation (e.g. addition, subtraction, multiplication, division): ").strip().lower()
-    if op == "addition":
-        print(f"Result: {num1 + num2}")
-    elif op == "subtraction":
-        print(f"Result: {num1 - num2}")
-    elif op == "multiplication":
-        print(f"Result: {num1 * num2}")
+    op = input("Enter operation (addition, subtraction, multiplication, division): ").strip().lower()
+    if op == "addition": print(f"Result: {num1 + num2}")
+    elif op == "subtraction": print(f"Result: {num1 - num2}")
+    elif op == "multiplication": print(f"Result: {num1 * num2}")
     elif op == "division":
-        if num2 != 0:
-            print(f"Result: {num1 / num2}")
-        else:
-            print("Error: Cannot divide by zero!")
-
+        if num2 != 0: print(f"Result: {num1 / num2}")
+        else: print("Error: Cannot divide by zero!")
 
 def main():
     print_banner()
-
     print(GREEN + "Hello there, I am bAsIc." + RESET)
     name = input("What's your name? - ").strip()
     print(GREEN + "Okay, your name is " + name + RESET)
 
-    jokes = [
-        "Why did the computer show up at work late? It had a hard drive.",
-        "There are 10 kinds of people in the world: those who understand binary and those who don't.",
-        "I would tell you a UDP joke, but you might not get it.",
-    ]
-    compliments = [
-        "You are doing great!",
-        "You are smarter than you think.",
-        "The world is better with you in it, " + name + ".",
-    ]
-    quotes = [
-        "Keep going, you are closer than you think.",
-        "Every expert was once a beginner.",
-        "Small steps every day lead to big change.",
-    ]
+    jokes = ["Why did the computer show up at work late? It had a hard drive.", "There are 10 kinds of people in the world: those who understand binary and those who don't.", "I would tell you a UDP joke, but you might not get it."]
+    compliments = ["You are doing great!", "You are smarter than you think.", "The world is better with you in it, " + name + "."]
+    quotes = ["Keep going, you are closer than you think.", "Every expert was once a beginner.", "Small steps every day lead to big change."]
 
     command_handlers = {
         normalize("How are you"): lambda: print(LIGHT_BLUE + "I am doing well, thanks for asking. 🤗" + RESET),
         normalize("What are you doing"): lambda: print(LIGHT_BLUE + "I am chatting with you. 💬" + RESET),
-        normalize("What do you think about right now"): lambda: print(
-            LIGHT_BLUE + "I am thinking about how to make a better AI than me. 💭" + RESET
-        ),
+        normalize("What do you think about right now"): lambda: print(LIGHT_BLUE + "I am thinking about how to make a better AI than me. 💭" + RESET),
         normalize("What to ask?"): lambda: print(LIGHT_BLUE + "Say something like " + str(query) + RESET),
         normalize("/help"): lambda: print(LIGHT_BLUE + "You can ask me things like " + str(query) + RESET),
-        normalize("/exit"): None,  # handled in-loop
-        normalize("I wish to ask a Fibonacci question"): None,  # handled in-loop
-        normalize("I wish to use a calculator"): None,  # handled in-loop
         normalize("What is your name"): lambda: print(LIGHT_BLUE + "My name is bAsIc." + RESET),
         normalize("Who created you"): lambda: print(LIGHT_BLUE + "I was created by Herbert Kumar." + RESET),
-        normalize("What can you do"): lambda: print(
-            LIGHT_BLUE + "I can chat with you, calculate expressions, and generate Fibonacci sequences." + RESET
-        ),
+        normalize("What can you do"): lambda: print(LIGHT_BLUE + "I can chat with you, calculate expressions, and generate Fibonacci sequences." + RESET),
         normalize("Tell me a joke"): lambda: print(LIGHT_BLUE + random.choice(jokes) + RESET),
-        normalize("What time is it"): lambda: print(
-            LIGHT_BLUE + "The current time is " + datetime.now().strftime("%H:%M:%S") + RESET
-        ),
-        normalize("Give me a random number"): lambda: print(
-            LIGHT_BLUE + "Here is a random number between 1 and 100: " + str(random.randint(1, 100)) + RESET
-        ),
+        normalize("What time is it"): lambda: print(LIGHT_BLUE + "The current time is " + datetime.now().strftime("%H:%M:%S") + RESET),
+        normalize("Give me a random number"): lambda: print(LIGHT_BLUE + "Here is a random number between 1 and 100: " + str(random.randint(1, 100)) + RESET),
         normalize("Compliment me"): lambda: print(LIGHT_BLUE + random.choice(compliments) + RESET),
         normalize("Inspire me"): lambda: print(LIGHT_BLUE + random.choice(quotes) + RESET),
     }
@@ -265,13 +174,12 @@ def main():
             if userask_normalized == normalize("/exit"):
                 print(YELLOW + "Goodbye!" + RESET)
                 break
-            if userask_normalized == normalize("I wish to ask a fibbonaci question"):
+            if userask_normalized == normalize("I wish to ask a Fibonacci question"):
                 try:
                     user_fib = int(input("Enter the number of Fibonacci numbers to generate: "))
+                    print(LIGHT_BLUE + str(fibonacci(user_fib)) + RESET)
                 except ValueError:
                     print(RED + "Please enter a valid number." + RESET)
-                    continue
-                print(LIGHT_BLUE + str(fibonacci(user_fib)) + RESET)
                 continue
             if userask_normalized == normalize("I wish to use a calculator"):
                 expr = input("Enter a calculation (for example: 2 + 2 * 3) - ")
@@ -286,13 +194,13 @@ def main():
         if userask_normalized == "exit":
             print(YELLOW + "Use /exit next time. Bye!" + RESET)
             break
+        
+        # This now triggers correctly for inputs like "2+2"
         if contains_any(userask_normalized, symbols_to_check):
             manual_calculator_mode()
         elif contains_any(userask_normalized, normalized_tango_mangle_keywords):
-            for _ in range(7):
-                print("Do you want a free chicken nugget")
-            print("continued to infinity")
-            print(YELLOW + "You found a secret and got tangomangled lol" + RESET)
+            for _ in range(7): print("Do you want a free chicken nugget")
+            print("continued to infinity\n" + YELLOW + "You found a secret and got tangomangled lol" + RESET)
         elif contains_any(userask_normalized, normalized_set_of_questions2):
             print("Ask whatever you want! If you need help, type 'help pls'.")
         elif contains_any(userask_normalized, normalized_set_of_questions3):
@@ -302,16 +210,15 @@ def main():
         elif contains_any(userask_normalized, normalized_set_of_greetings):
             print("Hello! I'm here to help.")
         elif contains_any(userask_normalized, normalized_set_of_purpose):
-            print("I am bAsIc, an AI that answers questions, has basic conversations, and calculates answers.") 
+            print("I am bAsIc, an AI that answers questions and calculates answers.") 
         elif contains_any(userask_normalized, normalized_set_of_capabilities):
-            print("My core strengths are basic communication, giving fibonacci, and answering basic arithmetic equations questions.")
+            print("My core strengths are basic communication and arithmetic.")
         elif contains_any(userask_normalized, normalized_set_of_feedbackP):
             print(":), I am happy to help.")
         elif contains_any(userask_normalized, normalized_set_of_feedbackN):
-            print(":(, sorry , I am just trying to help I am not that advanced.")
+            print(":(, sorry, I am just trying to help.")
         else:
             print(RED + "I'm not sure how to do that yet, but I'm listening!" + RESET)
-
 
 if __name__ == "__main__":
     main()

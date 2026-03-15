@@ -221,7 +221,7 @@ def main():
         elif contains_any(userask_normalized, normalized_set_of_feedbackN):
             print(":(, sorry, I am just trying to help.")
         elif contains_any(userask_normalized, normalized_kick_out_words):
-            print(YELLOW + ":(, Very rude and unapropriate, initiating kick out")
+            print(YELLOW + ":(, Very rude and unapropriate,")
             print(RED + "Initiating kick out")
             break
         else:

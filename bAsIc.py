@@ -5,7 +5,7 @@ r"""
 | |_) / ___ \\__ \| | (__
 |_.__/_/   \_\___/___\___|
 A basic AI that can answer some basic questions. It is only allowed to be asked a few specific questions.
-By Herbert Kumar & Akshaj Tiwari(y3ll0what_, whitespc_,Aks-pro171Git)
+By Herbert Kumar (y3ll0what_, whitespc_) & Akshaj Tiwari (Aks-pro171Git)
 """
 
 import random
@@ -109,8 +109,8 @@ set_of_capabilities = [
     "what are your strengths",
     "what are you good at",
 ]
-set_of_feedbackP = ["ok","sure","wow","you are good","you are so good",]
-set_of_feedbackN = ["no","nah","bruh","you are bad","you are so bad","eww"]
+set_of_feedbackP = ["ok","sure","wow","you are good","you are so good","Yes"]
+set_of_feedbackN = ["no","nah","bruh","you are bad","you are so bad","eww","No"]
 tango_mangle_keywords = ["tangomangle", "do you want a free chicken nugget"]
 
 # Normalized versions of several keyword sets.

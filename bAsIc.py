@@ -134,6 +134,11 @@ def main():
         if userask_normalized == "/exit" or userask_normalized == "exit":
             print(YELLOW + "Goodbye!" + RESET)
             break
+        elif userask_normalized == "/help" or userask_normalized == "help":
+            print(YELLOW + "I can perform calculations by calculator mode.")
+            print(YELLOW + "I can do basic communication.")
+            print(YELLOW + "I also have some hidden secrets.")
+            print(YELLOW + "I am age friendly and prevent bad things.")
 
         # 4. FULL ELIF STATEMENTS (RESTORING ALL RESPONSES)
         if contains_any(userask_normalized, symbols_to_check):
@@ -145,7 +150,7 @@ def main():
             print("continued to infinity\n" + YELLOW + "You found a secret and got tangomangled lol" + RESET)
         elif contains_any(userask_normalized, set_of_questions2):
             last_response_type = "help"
-            print("Ask whatever you want! If you need help, type 'help pls'.")
+            print("Ask whatever you want! If you need help, type '/help'.")
         elif contains_any(userask_normalized, set_of_questions3):
             last_response_type = "success"
             print("By being dedicated and working hard.")

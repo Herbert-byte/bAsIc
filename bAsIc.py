@@ -46,14 +46,14 @@ def contains_any(text, symbols):
     return False
 
 # --- Original Statement Sets ---
-symbols_to_check = ["/", "*", "-", "+", "multiply", "divide", "add", "subtract", "plus", "minus"]
+symbols_to_check = ["/", "*", "-", "+", "multiply", "divide", "add", "subtract", "plus", "minus","arithmatics","calculaor"]
 set_of_purpose = ["who are you", "what are you", "what do you do", "tell me about yourself", "what is your purpose", "who is this", "help pls", "What kind of AI are you?", "Introduce yourself"]
 set_of_greetings = ["hi", "hello", "whats up?", "whats up", "yo!", "hey"]
 set_of_questions = ["how are you?", "you good?", "are you well?"]
 set_of_questions2 = ["how can i get help", "i need help", "help me", "what should i do?", "what can i ask?"]
 set_of_questions3 = ["how can i win", "how to succeed", "how can i do good in life"]
 set_of_capabilities = ["what can you do", "what are your capabilities", "what are your strengths", "what are you good at"]
-set_of_feedbackP = ["ok","sure","wow","you are good","you are so good","Yes"]
+set_of_feedbackP = ["ok","sure","wow","you are good","you are so good","Yes","thank you"]
 set_of_feedbackN = ["no","nah","bruh","you are bad","you are so bad","eww","No"]
 tango_mangle_keywords = ["tangomangle", "do you want a free chicken nugget"]
 kick_out_words = ["fuck","motherfucker","matharchod","bitch","dick","lauda","maa ki"]

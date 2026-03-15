@@ -139,6 +139,7 @@ def main():
             print(YELLOW + "I can do basic communication.")
             print(YELLOW + "I also have some hidden secrets.")
             print(YELLOW + "I am age friendly and prevent bad things." + RESET)
+            continue
 
         # 4. FULL ELIF STATEMENTS (RESTORING ALL RESPONSES)
         if contains_any(userask_normalized, symbols_to_check):

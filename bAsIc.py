@@ -101,6 +101,7 @@ set_of_questions2 = [
     "i need help",
     "help me",
     "what should i do?",
+    "what can i ask?",
 ]
 set_of_questions3 = ["how can i win", "how to succeed", "how can i do good in life"]
 set_of_capabilities = [

@@ -138,7 +138,7 @@ def main():
             print(YELLOW + "I can perform calculations by calculator mode.")
             print(YELLOW + "I can do basic communication.")
             print(YELLOW + "I also have some hidden secrets.")
-            print(YELLOW + "I am age friendly and prevent bad things.")
+            print(YELLOW + "I am age friendly and prevent bad things." + RESET)
 
         # 4. FULL ELIF STATEMENTS (RESTORING ALL RESPONSES)
         if contains_any(userask_normalized, symbols_to_check):

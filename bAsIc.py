@@ -58,6 +58,7 @@ set_of_feedbackN = ["no","nah","bruh","you are bad","you are so bad","eww","No"]
 tango_mangle_keywords = ["tangomangle", "do you want a free chicken nugget"]
 kick_out_words = ["fuck","motherfucker","matharchod","bitch","dick","lauda","maa ki"]
 context_triggers = ["why", "how", "explain", "tell me more"]
+set_of_continuationwords = ["so","now","also","lets continue"]
 
 def calculate(expression):
     try:
@@ -120,6 +121,8 @@ def main():
                 print(LIGHT_BLUE + "I'm just a bAsIc AI meant to help with simple tasks." + RESET)
             elif last_response_type == "":
                 print(LIGHT_BLUE + "I haven't said anything to explain yet!" + RESET)
+            elif last_response_type == "continuation":
+                print(LIGHT_BLUE + "You were saying something, right?" + RESET)
             else:
                 print(LIGHT_BLUE + f"That was a response for my '{last_response_type}' logic branch." + RESET)
             continue
@@ -169,10 +172,13 @@ def main():
             print("My core strengths are basic communication and arithmetic.")
         elif contains_any(userask_normalized, set_of_feedbackP):
             last_response_type = "feedbackP"
-            print(":), I am happy to help.")
+            print(GREEN + ":), I am happy to help." + RESET)
         elif contains_any(userask_normalized, set_of_feedbackN):
             last_response_type = "feedbackN"
-            print(":(, sorry, I am just trying to help.")
+            print(RED + ":(, sorry, I am just trying to help." + RESET)
+        elif contains_any(userask_normalized, set_of_continuationwords):
+            last_response_type = "feedbackN"
+            print(YELLOW + "Yes,?" + RESET)
         elif "joke" in userask_normalized:
             last_response_type = "joke"
             print(LIGHT_BLUE + random.choice(jokes) + RESET)

@@ -177,7 +177,7 @@ def main():
             last_response_type = "feedbackN"
             print(RED + ":(, sorry, I am just trying to help." + RESET)
         elif contains_any(userask_normalized, set_of_continuationwords):
-            last_response_type = "feedbackN"
+            last_response_type = "continuation"
             print(YELLOW + "Yes,?" + RESET)
         elif "joke" in userask_normalized:
             last_response_type = "joke"

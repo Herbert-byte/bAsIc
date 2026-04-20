@@ -1,5 +1,6 @@
 import random
 import re
+import time
 from datetime import datetime
 import sys
 import tty
@@ -18,6 +19,7 @@ YELLOW = "\033[33m"
 CYAN = "\033[36m"
 LIGHT_BLUE = "\033[94m"
 RESET = "\033[0m"
+AI_RESPONSE_DELAY_SECONDS = 1.0
 
 BANNER = [
     "  _       _        ___     ",
@@ -79,6 +81,12 @@ def print_banner():
     for line in BANNER: print(CYAN + line)
     print(RESET, end="")
 
+def ai_print(*args, **kwargs):
+    if "flush" not in kwargs:
+        kwargs["flush"] = True
+    print(*args, **kwargs)
+    time.sleep(AI_RESPONSE_DELAY_SECONDS)
+
 def manual_calculator_mode():
     choice = input("Action triggered: Go to calculator mode? (yes/no): ").strip().lower()
     if choice != "yes": return
@@ -94,6 +102,30 @@ def manual_calculator_mode():
             else: print("Error: Cannot divide by zero!")
     except ValueError:
         print("Error: Please enter numbers only!")
+
+def process_userask(userask_normalized, jokes, kick_out_words):
+    if contains_any(userask_normalized, ["hi", "hello"]):
+        ai_print("Hello! I'm here to help.")
+    elif contains_any(userask_normalized, ["joke", "funny"]):
+        ai_print(random.choice(jokes))
+    elif contains_any(userask_normalized, ["time"]):
+        ai_print(datetime.now().strftime("%H:%M:%S"))
+    elif contains_any(userask_normalized, ["name"]):
+        ai_print("I am bAsIc!")
+    elif contains_any(userask_normalized, ["help"]):
+        ai_print("I can help with math, fibonacci, jokes, time, compliments, and more!")
+    elif contains_any(userask_normalized, ["calculator", "calc", "+", "-", "*", "/"]):
+        manual_calculator_mode()
+    elif contains_any(userask_normalized, kick_out_words):
+        ai_print(YELLOW + ":(, Very rude!" + RESET)
+        ai_print(YELLOW + "Goodbye!" + RESET)
+        return True
+    elif contains_any(userask_normalized, ["exit", "/exit"]):
+        ai_print(YELLOW + "Goodbye!" + RESET)
+        return True
+    else:
+        ai_print(RED + "I'm not sure how to do that yet, but I'm listening!" + RESET)
+    return False
 
 def get_key():
     try:
@@ -125,26 +157,26 @@ def handle_choice(choice, name, jokes, compliments, quotes):
         n = input("How many Fibonacci numbers? ")
         try:
             count = int(n)
-            print("Fibonacci sequence:", fibonacci(count))
+            ai_print("Fibonacci sequence:", fibonacci(count))
         except ValueError:
-            print("Please enter a valid number!")
+            ai_print("Please enter a valid number!")
     elif choice == "calc":
         manual_calculator_mode()
     elif choice == "time":
-        print(datetime.now().strftime("%H:%M:%S"))
+        ai_print(datetime.now().strftime("%H:%M:%S"))
     elif choice == "random":
-        print(random.randint(1, 100))
+        ai_print(random.randint(1, 100))
     elif choice == "joke":
-        print(random.choice(jokes))
+        ai_print(random.choice(jokes))
     elif choice == "compliment":
-        print(random.choice(compliments))
+        ai_print(random.choice(compliments))
     elif choice == "inspire":
-        print(random.choice(quotes))
+        ai_print(random.choice(quotes))
     elif choice == "help":
-        print("I can perform calculations by calculator mode.")
-        print("I can do basic communication.")
-        print("I also have some hidden secrets.")
-        print("I am age friendly and prevent bad things.")
+        ai_print("I can perform calculations by calculator mode.")
+        ai_print("I can do basic communication.")
+        ai_print("I also have some hidden secrets.")
+        ai_print("I am age friendly and prevent bad things.")
     elif choice == "quit" or choice == "exit":
         return True
     return False
@@ -152,6 +184,16 @@ def handle_choice(choice, name, jokes, compliments, quotes):
 CURSES_FAILED = False
 
 if CURSES_AVAILABLE:
+    def run_outside_curses(stdscr, fn, *args, **kwargs):
+        curses.def_prog_mode()
+        curses.endwin()
+        try:
+            return fn(*args, **kwargs)
+        finally:
+            curses.reset_prog_mode()
+            stdscr.clear()
+            stdscr.refresh()
+
     def draw_menu(stdscr, selected_row, options):
         stdscr.clear()
         h, w = stdscr.getmaxyx()
@@ -216,22 +258,16 @@ if CURSES_AVAILABLE:
     def curses_main(stdscr):
         global CURSES_FAILED
         try:
-            curses.nocbreak()
-            curses.echo()
-            curses.endwin()
-        except:
-            pass
-        
-        try:
-            print_banner()
-            print(GREEN + "Hello there, I am bAsIc." + RESET)
-            name = input("What's your name? - ").strip()
-            print(GREEN + "Okay, your name is " + name + RESET)
-            print()
+            run_outside_curses(stdscr, print_banner)
+            run_outside_curses(stdscr, print, GREEN + "Hello there, I am bAsIc." + RESET)
+            name = run_outside_curses(stdscr, input, "What's your name? - ").strip()
+            run_outside_curses(stdscr, print, GREEN + "Okay, your name is " + name + RESET)
+            run_outside_curses(stdscr, print)
 
             jokes = ["Why did the computer show up at work late? It had a hard drive.", "There are 10 kinds of people in the world: those who understand binary and those who don't.", "I would tell you a UDP joke, but you might not get it."]
             compliments = ["You are doing great!", "You are smarter than you think.", "The world is better with you in it, " + name + "."]
             quotes = ["Keep going, you are closer than you think.", "Every expert was once a beginner.", "Small steps every day lead to big change."]
+            kick_out_words = ["fuck","motherfucker","matharchod","bitch","dick","lauda","maa ki"]
 
             while True:
                 choice = run_curses_menu(stdscr, MENU_OPTIONS)
@@ -239,25 +275,17 @@ if CURSES_AVAILABLE:
                 if choice == "quit":
                     break
                 elif choice == "type":
-                    stdscr.clear()
-                    stdscr.nodelay(False)
-                    userask = input("Ask me something - ")
-                    stdscr.nodelay(True)
-                    stdscr.timeout(100)
+                    userask = run_outside_curses(stdscr, input, "Ask me something - ")
+                    userask_normalized = normalize(userask)
+                    should_exit = run_outside_curses(
+                        stdscr, process_userask, userask_normalized, jokes, kick_out_words
+                    )
+                    if should_exit:
+                        break
                 else:
-                    done = handle_choice(choice, name, jokes, compliments, quotes)
+                    done = run_outside_curses(stdscr, handle_choice, choice, name, jokes, compliments, quotes)
                     if done:
                         break
-                
-                try:
-                    stdscr.nodelay(False)
-                    stdscr.addstr(curses.LINES - 1, 0, "Press any key to continue...")
-                    stdscr.refresh()
-                    stdscr.getch()
-                    stdscr.nodelay(True)
-                    stdscr.timeout(100)
-                except curses.error:
-                    pass
         except Exception as e:
             CURSES_FAILED = True
             raise e
@@ -365,26 +393,9 @@ def main():
             if choice == "type":
                 userask = input("Ask me something - ")
                 userask_normalized = normalize(userask)
-                
-                if contains_any(userask_normalized, ["joke", "funny"]):
-                    print(random.choice(jokes))
-                elif contains_any(userask_normalized, ["time"]):
-                    print(datetime.now().strftime("%H:%M:%S"))
-                elif contains_any(userask_normalized, ["name"]):
-                    print(f"I am bAsIc!")
-                elif contains_any(userask_normalized, ["help"]):
-                    print("I can help with math, fibonacci, jokes, time, compliments, and more!")
-                elif contains_any(userask_normalized, ["calculator", "calc", "+", "-", "*", "/"]):
-                    manual_calculator_mode()
-                elif contains_any(userask_normalized, kick_out_words):
-                    print(YELLOW + ":(, Very rude!" + RESET)
-                    print(YELLOW + "Goodbye!" + RESET)
+                should_exit = process_userask(userask_normalized, jokes, kick_out_words)
+                if should_exit:
                     return
-                elif contains_any(userask_normalized, ["exit", "/exit"]):
-                    print(YELLOW + "Goodbye!" + RESET)
-                    return
-                else:
-                    print(RED + "I'm not sure how to do that yet, but I'm listening!" + RESET)
                 continue
             done = handle_choice(choice, name, jokes, compliments, quotes)
             if done:
@@ -399,32 +410,32 @@ def main():
 
         if userask_normalized in context_triggers:
             if last_response_type == "math":
-                print(LIGHT_BLUE + "I triggered the calculator because I detected math operators." + RESET)
+                ai_print(LIGHT_BLUE + "I triggered the calculator because I detected math operators." + RESET)
             elif last_response_type == "success":
-                print(LIGHT_BLUE + "Hard work is the only way to reach your goals!" + RESET)
+                ai_print(LIGHT_BLUE + "Hard work is the only way to reach your goals!" + RESET)
             elif last_response_type == "purpose":
-                print(LIGHT_BLUE + "I'm just a bAsIc AI meant to help with simple tasks." + RESET)
+                ai_print(LIGHT_BLUE + "I'm just a bAsIc AI meant to help with simple tasks." + RESET)
             elif last_response_type == "":
-                print(LIGHT_BLUE + "I haven't said anything to explain yet!" + RESET)
+                ai_print(LIGHT_BLUE + "I haven't said anything to explain yet!" + RESET)
             elif last_response_type == "continuation":
-                print(LIGHT_BLUE + "You were saying something, right?" + RESET)
+                ai_print(LIGHT_BLUE + "You were saying something, right?" + RESET)
             else:
-                print(LIGHT_BLUE + f"That was a response for my '{last_response_type}' logic branch." + RESET)
+                ai_print(LIGHT_BLUE + f"That was a response for my '{last_response_type}' logic branch." + RESET)
             continue
 
         if contains_any(userask_normalized, kick_out_words):
-            print(YELLOW + ":(, Very rude and unapropiate,")
-            print(RED + "Initiating kick out")
+            ai_print(YELLOW + ":(, Very rude and unapropiate,")
+            ai_print(RED + "Initiating kick out")
             break
 
         if userask_normalized == "/exit" or userask_normalized == "exit":
-            print(YELLOW + "Goodbye!" + RESET)
+            ai_print(YELLOW + "Goodbye!" + RESET)
             break
         elif userask_normalized == "/help" or userask_normalized == "help":
-            print("I can perform calculations by calculator mode.")
-            print("I can do basic communication.")
-            print("I also have some hidden secrets.")
-            print("I am age friendly and prevent bad things.")
+            ai_print("I can perform calculations by calculator mode.")
+            ai_print("I can do basic communication.")
+            ai_print("I also have some hidden secrets.")
+            ai_print("I am age friendly and prevent bad things.")
             continue
 
         if contains_any(userask_normalized, symbols_to_check):
@@ -432,44 +443,44 @@ def main():
             manual_calculator_mode()
         elif contains_any(userask_normalized, tango_mangle_keywords):
             last_response_type = "tangomangle"
-            for _ in range(7): print("Do you want a free chicken nugget")
-            print("continued to infinity\n" + YELLOW + "You found a secret and got tangomangled lol" + RESET)
+            for _ in range(7): ai_print("Do you want a free chicken nugget")
+            ai_print("continued to infinity\n" + YELLOW + "You found a secret and got tangomangled lol" + RESET)
         elif contains_any(userask_normalized, set_of_questions2):
             last_response_type = "help"
-            print("Ask whatever you want! If you need help, type '/help'.")
+            ai_print("Ask whatever you want! If you need help, type '/help'.")
         elif contains_any(userask_normalized, set_of_questions3):
             last_response_type = "success"
-            print("By being dedicated and working hard.")
+            ai_print("By being dedicated and working hard.")
         elif contains_any(userask_normalized, set_of_questions):
             last_response_type = "status"
-            print("I am great, I hope you are too!")
+            ai_print("I am great, I hope you are too!")
         elif contains_any(userask_normalized, set_of_greetings):
             last_response_type = "greeting"
-            print("Hello! I'm here to help.")
+            ai_print("Hello! I'm here to help.")
         elif contains_any(userask_normalized, set_of_purpose):
             last_response_type = "purpose"
-            print("I am bAsIc, an AI that answers questions and calculates answers.") 
+            ai_print("I am bAsIc, an AI that answers questions and calculates answers.") 
         elif contains_any(userask_normalized, set_of_capabilities):
             last_response_type = "capabilities"
-            print("My core strengths are basic communication and arithmetic.")
+            ai_print("My core strengths are basic communication and arithmetic.")
         elif contains_any(userask_normalized, set_of_feedbackP):
             last_response_type = "feedbackP"
-            print(GREEN + ":), I am happy to help." + RESET)
+            ai_print(GREEN + ":), I am happy to help." + RESET)
         elif contains_any(userask_normalized, set_of_feedbackN):
             last_response_type = "feedbackN"
-            print(RED + ":(, sorry, I am just trying to help." + RESET)
+            ai_print(RED + ":(, sorry, I am just trying to help." + RESET)
         elif contains_any(userask_normalized, set_of_continuationwords):
             last_response_type = "continuation"
-            print(YELLOW + "Yes,?" + RESET)
+            ai_print(YELLOW + "Yes,?" + RESET)
         elif "joke" in userask_normalized:
             last_response_type = "joke"
-            print(LIGHT_BLUE + random.choice(jokes) + RESET)
+            ai_print(LIGHT_BLUE + random.choice(jokes) + RESET)
         elif "time" in userask_normalized:
             last_response_type = "time"
-            print(LIGHT_BLUE + datetime.now().strftime("%H:%M:%S") + RESET)
+            ai_print(LIGHT_BLUE + datetime.now().strftime("%H:%M:%S") + RESET)
         else:
             last_response_type = "unknown"
-            print(RED + "I'm not sure how to do that yet, but I'm listening!" + RESET)
+            ai_print(RED + "I'm not sure how to do that yet, but I'm listening!" + RESET)
 
 if __name__ == "__main__":
     main()

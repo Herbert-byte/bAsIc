@@ -1,3 +1,7 @@
+"""
+
+"""
+
 import random
 import re
 import time
@@ -22,11 +26,12 @@ RESET = "\033[0m"
 AI_RESPONSE_DELAY_SECONDS = 1.0
 
 BANNER = [
-    "  _       _        ___     ",
-    " | |__   / \\   ___|_ _|___ ",
-    " | '_ \\ / _ \\ / __| |/ __|",
-    " | |_) / ___ \\ (__| | (__ ",
-    " |_.__/_/   \\_\\___|___\\___|",
+    " ▄▄                     ▄▄▄▄▄▄      ",
+    " █▄      ▄█▀▀█▄        █▀ ██        ",
+    " ██      ██  ██           ██        ",
+    " ████▄   ██▀▀██   ▄██▀█   ██   ▄███▀",
+    " ██ ██ ▄ ██  ██   ▀███▄   ██   ██   ",
+   "▄████▀ ▀██▀  ▀█▄██▄▄██▀ ▄▄██▄▄▄▀███▄",
 ]
 
 BASE_QUERY = [
@@ -152,7 +157,7 @@ def get_key():
 
 def handle_choice(choice, name, jokes, compliments, quotes):
     last_response_type = ""
-    
+
     if choice == "fib":
         n = input("How many Fibonacci numbers? ")
         try:
@@ -197,21 +202,21 @@ if CURSES_AVAILABLE:
     def draw_menu(stdscr, selected_row, options):
         stdscr.clear()
         h, w = stdscr.getmaxyx()
-        
+
         if h < len(options) + 3:
             stdscr.addstr(0, 0, "Terminal too small! Need more rows.")
             stdscr.refresh()
             return
-        
+
         mid_y = h // 2
         start_y = mid_y - len(options) // 2
-        
+
         for idx, (label, _) in enumerate(options):
             y = start_y + idx
             if 0 <= y < h:
                 display_label = label[:w-6] if len(label) > w-6 else label
                 x = max(1, (w - len(display_label)) // 2)
-                
+
                 if idx == selected_row:
                     try:
                         stdscr.addstr(y, x, f"> {display_label} <", curses.A_REVERSE)
@@ -222,12 +227,12 @@ if CURSES_AVAILABLE:
                         stdscr.addstr(y, x, f"  {display_label}  ")
                     except curses.error:
                         pass
-        
+
         try:
             stdscr.addstr(h - 1, 0, "↑/↓: Navigate | Enter: Select | Q: Quit")
         except curses.error:
             pass
-        
+
         stdscr.refresh()
 
     def run_curses_menu(stdscr, options):
@@ -235,13 +240,13 @@ if CURSES_AVAILABLE:
         stdscr.clear()
         stdscr.nodelay(True)
         stdscr.timeout(100)
-        
+
         selected = 0
         draw_menu(stdscr, selected, options)
-        
+
         while True:
             key = stdscr.getch()
-            
+
             if key == ord('\n') or key == ord(' '):
                 return options[selected][1]
             elif key == curses.KEY_UP or key == ord('w'):
@@ -271,7 +276,7 @@ if CURSES_AVAILABLE:
 
             while True:
                 choice = run_curses_menu(stdscr, MENU_OPTIONS)
-                
+
                 if choice == "quit":
                     break
                 elif choice == "type":
@@ -301,7 +306,7 @@ def text_menu_select(options, jokes, compliments, quotes):
             marker = ">" if idx == selected else " "
             print(f"  {marker} {label}")
         print("=" * 30 + "\n")
-        
+
         if sys.platform != "win32":
             try:
                 key = get_key()
@@ -328,7 +333,7 @@ def text_menu_select(options, jokes, compliments, quotes):
             except ValueError:
                 pass
             continue
-        
+
         if key == '\n' or key == '':
             return options[selected][1]
         elif key in ('1', '2', '3', '4', '5', '6', '7', '8', '9', '0'):
@@ -347,7 +352,7 @@ def text_menu_select(options, jokes, compliments, quotes):
 
 def main():
     global CURSES_FAILED
-    
+
     if CURSES_AVAILABLE and not CURSES_FAILED:
         try:
             curses.wrapper(curses_main)
@@ -361,7 +366,7 @@ def main():
                 pass
             print(YELLOW + f"Could not use curses menu: {e}" + RESET)
             print(YELLOW + "Falling back to text menu..." + RESET)
-    
+
     print(GREEN + "Hello there, I am bAsIc." + RESET)
     name = input("What's your name? - ").strip()
     print(GREEN + "Okay, your name is " + name + RESET)
@@ -369,7 +374,7 @@ def main():
     jokes = ["Why did the computer show up at work late? It had a hard drive.", "There are 10 kinds of people in the world: those who understand binary and those who don't.", "I would tell you a UDP joke, but you might not get it."]
     compliments = ["You are doing great!", "You are smarter than you think.", "The world is better with you in it, " + name + "."]
     quotes = ["Keep going, you are closer than you think.", "Every expert was once a beginner.", "Small steps every day lead to big change."]
-    
+
     symbols_to_check = ["/", "*", "-", "+", "multiply", "divide", "add", "subtract", "plus", "minus","arithmetics","calculator","arithmetic"]
     set_of_purpose = ["who are you", "what are you", "what do you do", "tell me about yourself", "what is your purpose", "who is this", "help pls", "What kind of AI are you?", "Introduce yourself"]
     set_of_greetings = ["hi", "hello", "whats up?", "whats up", "yo!", "hey"]
@@ -383,10 +388,10 @@ def main():
     kick_out_words = ["fuck","motherfucker","matharchod","bitch","dick","lauda","maa ki"]
     context_triggers = ["why", "how", "explain", "tell me more"]
     set_of_continuationwords = ["so","now","also","lets continue"]
-    
+
     print("\nSelect mode: (t)ext menu or (d)irect input [t/d]: ", end="")
     mode = input().strip().lower()
-    
+
     if mode == "t":
         while True:
             choice = text_menu_select(MENU_OPTIONS, jokes, compliments, quotes)
@@ -402,7 +407,7 @@ def main():
                 print(YELLOW + "Goodbye!" + RESET)
                 break
         return
-    
+
     last_response_type = ""
     while True:
         userask = input("Ask me something - ")
@@ -459,7 +464,7 @@ def main():
             ai_print("Hello! I'm here to help.")
         elif contains_any(userask_normalized, set_of_purpose):
             last_response_type = "purpose"
-            ai_print("I am bAsIc, an AI that answers questions and calculates answers.") 
+            ai_print("I am bAsIc, an AI that answers questions and calculates answers.")
         elif contains_any(userask_normalized, set_of_capabilities):
             last_response_type = "capabilities"
             ai_print("My core strengths are basic communication and arithmetic.")

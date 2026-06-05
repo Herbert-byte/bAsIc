@@ -7,6 +7,7 @@ import re
 import time
 from datetime import datetime
 import sys
+import shutil
 import tty
 import termios
 
@@ -17,12 +18,39 @@ except ImportError:
     CURSES_AVAILABLE = False
     curses = None
 
-RED = "\033[31m"
-GREEN = "\033[32m"
-YELLOW = "\033[33m"
-CYAN = "\033[36m"
-LIGHT_BLUE = "\033[94m"
-RESET = "\033[0m"
+IN_IDLE = False
+try:
+    IN_IDLE = sys.stdin.__class__.__name__ == 'PyShell'
+except Exception:
+    pass
+
+if IN_IDLE:
+    RED = GREEN = YELLOW = CYAN = LIGHT_BLUE = RESET = ""
+
+    class _IdleOut:
+        _map = str.maketrans({
+            '┌': '+', '─': '-', '┐': '+', '│': '|',
+            '├': '+', '┤': '+', '└': '+', '┘': '+',
+            '▸': '>', '●': '*', '█': '#', '░': '.',
+            '═': '=', '╔': '+', '╗': '+', '╚': '+', '╝': '+',
+        })
+        def __init__(self, s):
+            self._s = s
+        def write(self, t):
+            t = re.sub(r'\033\[[0-9;?]*[A-Za-z]', '', t)
+            t = t.translate(self._map)
+            self._s.write(t)
+        def flush(self):
+            self._s.flush()
+
+    sys.stdout = _IdleOut(sys.stdout)
+else:
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    CYAN = "\033[36m"
+    LIGHT_BLUE = "\033[94m"
+    RESET = "\033[0m"
 AI_RESPONSE_DELAY_SECONDS = 1.0
 
 BANNER = [
@@ -55,6 +83,101 @@ MENU_OPTIONS = [
     ("/exit", "exit"),
 ]
 
+def clear_line():
+    print("\033[2K", end="\r")
+
+def typewrite(text, delay=0.03, color="", end="\n"):
+    for ch in text:
+        if color:
+            sys.stdout.write(color + ch + RESET)
+        else:
+            sys.stdout.write(ch)
+        sys.stdout.flush()
+        time.sleep(delay)
+    sys.stdout.write(end)
+    sys.stdout.flush()
+
+def thinking_animation(duration=1.0):
+    sys.stdout.write(GREEN + "  thinking" + RESET)
+    steps = 5
+    for _ in range(steps):
+        sys.stdout.write(CYAN + " ●" + RESET)
+        sys.stdout.flush()
+        time.sleep(duration / steps)
+    print()
+
+def styled_input(prompt="Ask me something"):
+    print()
+    print(CYAN + " ┌─" + "─" * 38 + "┐" + RESET)
+    val = input(CYAN + " │ " + YELLOW + prompt + CYAN + " : " + RESET).strip()
+    print(CYAN + " └─" + "─" * 38 + "┘" + RESET)
+    return val
+
+def anim_bar(duration=1.5, label=""):
+    try:
+        cols = shutil.get_terminal_size().columns
+    except Exception:
+        cols = 80
+    bar_width = min(30, cols - 30)
+    if bar_width < 5:
+        bar_width = 5
+    steps = bar_width
+
+    empty = "░" * steps
+    clear_line()
+    sys.stdout.write(f"{GREEN}[{empty}]{RESET}   0% {label}")
+    sys.stdout.flush()
+    time.sleep(0.15)
+
+    for i in range(1, steps + 1):
+        pct = int((i / steps) * 100)
+        filled = "█" * i
+        empty = "░" * (steps - i)
+        clear_line()
+        sys.stdout.write(f"{GREEN}[{filled}{empty}]{RESET} {pct:3d}% {label}")
+        sys.stdout.flush()
+        time.sleep(duration / steps)
+    print()
+
+def boot_splash_and_get_name():
+    print("\033[H\033[J", end="")
+
+    cols = shutil.get_terminal_size().columns
+    box_w = min(48, cols - 4)
+
+    def draw_border(left, fill, right, color=LIGHT_BLUE):
+        for ch in left:
+            print(color + ch + RESET, end="", flush=True)
+            time.sleep(0.005)
+        for ch in fill:
+            print(color + ch + RESET, end="", flush=True)
+            time.sleep(0.001)
+        for ch in right:
+            print(color + ch + RESET, end="", flush=True)
+            time.sleep(0.005)
+        print()
+
+    draw_border("╔", "═" * box_w, "╗")
+
+    for line in BANNER:
+        typewrite(line, 0.003, CYAN)
+
+    draw_border("╚", "═" * box_w, "╝")
+    print()
+
+    anim_bar(0.8, CYAN + "Initializing bAsIc kernel..." + RESET)
+    anim_bar(0.6, CYAN + "Loading conversational modules..." + RESET)
+    anim_bar(1.0, CYAN + "bAsIc AI core ready." + RESET)
+    print()
+
+    typewrite(" ▸ Hello, I am bAsIc.", 0.04, GREEN)
+    print()
+    name = input(CYAN + " ▸ What's your name? " + RESET).strip()
+    print()
+    typewrite(GREEN + f" ▸ Welcome, {name}!" + RESET, 0.03, YELLOW)
+    print()
+    return name
+
 def normalize(text):
     cleaned = re.sub(r"[^\w\s/+\-*]", "", text)
     return cleaned.strip().lower()
@@ -86,27 +209,75 @@ def print_banner():
     for line in BANNER: print(CYAN + line)
     print(RESET, end="")
 
+def _wrap_text(text, width):
+    words = text.split()
+    lines = []
+    cur = ""
+    for w in words:
+        if len(cur) + len(w) + 1 <= width:
+            cur = (cur + " " + w).strip()
+        else:
+            if cur:
+                lines.append(cur)
+            cur = w
+    if cur:
+        lines.append(cur)
+    return lines if lines else [""]
+
 def ai_print(*args, **kwargs):
-    if "flush" not in kwargs:
-        kwargs["flush"] = True
-    print(*args, **kwargs)
+    text = " ".join(str(a) for a in args)
+    has_color = "\033" in text
+    plain = re.sub(r'\033\[[0-9;]*m', '', text) if has_color else text
+
+    cols = shutil.get_terminal_size().columns
+    box_w = min(48, cols - 4)
+    cw = box_w - 4
+
+    print()
+    print(GREEN + "┌" + "─" * (box_w - 2) + "┐" + RESET)
+
+    if has_color:
+        display = plain[:cw]
+        pad = cw - len(display)
+        sys.stdout.write(GREEN + "│ " + RESET + text + " " * pad + GREEN + " │" + RESET + "\n")
+        sys.stdout.flush()
+    else:
+        for line in _wrap_text(plain, cw):
+            pad = cw - len(line)
+            sys.stdout.write(GREEN + "│ " + RESET)
+            for ch in line:
+                sys.stdout.write(GREEN + ch + RESET)
+                sys.stdout.flush()
+                time.sleep(0.03)
+            sys.stdout.write(" " * pad + GREEN + " │" + RESET + "\n")
+            sys.stdout.flush()
+
+    print(GREEN + "└" + "─" * (box_w - 2) + "┘" + RESET)
+    print()
     time.sleep(AI_RESPONSE_DELAY_SECONDS)
 
 def manual_calculator_mode():
-    choice = input("Action triggered: Go to calculator mode? (yes/no): ").strip().lower()
+    choice = styled_input("Go to calculator mode? (yes/no)").lower()
     if choice != "yes": return
     try:
-        num1 = int(input("Enter the first number: "))
-        num2 = int(input("Enter the second number: "))
-        op = input("Enter operation (addition, subtraction, multiplication, division): ").strip().lower()
-        if op == "addition": print(f"Result: {num1 + num2}")
-        elif op == "subtraction": print(f"Result: {num1 - num2}")
-        elif op == "multiplication": print(f"Result: {num1 * num2}")
-        elif op == "division":
-            if num2 != 0: print(f"Result: {num1 / num2}")
-            else: print("Error: Cannot divide by zero!")
+        num1 = int(styled_input("Enter the first number"))
+        num2 = int(styled_input("Enter the second number"))
+        op = styled_input("Enter operation (add, sub, mul, div)").lower()
+        if op in ("addition", "add"):
+            ai_print(f"Result: {num1 + num2}")
+        elif op in ("subtraction", "sub"):
+            ai_print(f"Result: {num1 - num2}")
+        elif op in ("multiplication", "mul"):
+            ai_print(f"Result: {num1 * num2}")
+        elif op in ("division", "div"):
+            if num2 != 0:
+                ai_print(f"Result: {num1 / num2}")
+            else:
+                ai_print(RED + "Error: Cannot divide by zero!" + RESET)
+        else:
+            ai_print(RED + "Error: Unknown operation!" + RESET)
     except ValueError:
-        print("Error: Please enter numbers only!")
+        ai_print(RED + "Error: Please enter numbers only!" + RESET)
 
 def process_userask(userask_normalized, jokes, kick_out_words):
     if contains_any(userask_normalized, ["hi", "hello"]):
@@ -133,6 +304,8 @@ def process_userask(userask_normalized, jokes, kick_out_words):
     return False
 
 def get_key():
+    if IN_IDLE:
+        raise RuntimeError("IDLE")
     try:
         old_settings = termios.tcgetattr(sys.stdin)
         tty.setcbreak(sys.stdin.fileno())
@@ -159,12 +332,12 @@ def handle_choice(choice, name, jokes, compliments, quotes):
     last_response_type = ""
 
     if choice == "fib":
-        n = input("How many Fibonacci numbers? ")
+        n = styled_input("How many Fibonacci numbers")
         try:
             count = int(n)
-            ai_print("Fibonacci sequence:", fibonacci(count))
+            ai_print("Fibonacci sequence: " + str(fibonacci(count)))
         except ValueError:
-            ai_print("Please enter a valid number!")
+            ai_print(RED + "Please enter a valid number!" + RESET)
     elif choice == "calc":
         manual_calculator_mode()
     elif choice == "time":
@@ -178,10 +351,7 @@ def handle_choice(choice, name, jokes, compliments, quotes):
     elif choice == "inspire":
         ai_print(random.choice(quotes))
     elif choice == "help":
-        ai_print("I can perform calculations by calculator mode.")
-        ai_print("I can do basic communication.")
-        ai_print("I also have some hidden secrets.")
-        ai_print("I am age friendly and prevent bad things.")
+        ai_print("I can perform calculations. I can do basic communication. I also have hidden secrets. I am age friendly.")
     elif choice == "quit" or choice == "exit":
         return True
     return False
@@ -199,43 +369,78 @@ if CURSES_AVAILABLE:
             stdscr.clear()
             stdscr.refresh()
 
+    def init_curses_colors():
+        if curses.has_colors():
+            curses.start_color()
+            curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
+            curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+            curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLUE)
+            curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+
     def draw_menu(stdscr, selected_row, options):
         stdscr.clear()
         h, w = stdscr.getmaxyx()
 
-        if h < len(options) + 3:
-            stdscr.addstr(0, 0, "Terminal too small! Need more rows.")
+        logo_h = len(BANNER)
+        box_w = min(50, w - 4)
+        box_h = logo_h + len(options) + 4
+        start_x = max(0, (w - box_w) // 2)
+        start_y = max(0, (h - box_h) // 2)
+
+        if h < box_h + 2 or w < box_w + 4:
+            try:
+                stdscr.addstr(0, 0, "Terminal too small!")
+            except curses.error:
+                pass
             stdscr.refresh()
             return
 
-        mid_y = h // 2
-        start_y = mid_y - len(options) // 2
-
-        for idx, (label, _) in enumerate(options):
-            y = start_y + idx
-            if 0 <= y < h:
-                display_label = label[:w-6] if len(label) > w-6 else label
-                x = max(1, (w - len(display_label)) // 2)
-
-                if idx == selected_row:
-                    try:
-                        stdscr.addstr(y, x, f"> {display_label} <", curses.A_REVERSE)
-                    except curses.error:
-                        pass
-                else:
-                    try:
-                        stdscr.addstr(y, x, f"  {display_label}  ")
-                    except curses.error:
-                        pass
+        has_c = curses.has_colors()
+        cp_border = curses.color_pair(1) if has_c else 0
+        cp_logo = curses.color_pair(1) if has_c else 0
+        cp_sel = curses.color_pair(3) | curses.A_BOLD if has_c else curses.A_REVERSE
 
         try:
-            stdscr.addstr(h - 1, 0, "↑/↓: Navigate | Enter: Select | Q: Quit")
+            stdscr.addstr(start_y, start_x, "┌" + "─" * (box_w - 2) + "┐", cp_border)
+
+            for i, line in enumerate(BANNER):
+                y = start_y + 1 + i
+                display = line[:box_w - 4]
+                pad = box_w - 4 - len(display)
+                stdscr.addstr(y, start_x, "│", cp_border)
+                stdscr.addstr(y, start_x + 1, display + " " * pad, cp_logo)
+                stdscr.addstr(y, start_x + box_w - 1, "│", cp_border)
+
+            spacer_y = start_y + 1 + logo_h
+            stdscr.addstr(spacer_y, start_x, "│", cp_border)
+            stdscr.addstr(spacer_y, start_x + box_w - 1, "│", cp_border)
+
+            for idx, (label, _) in enumerate(options):
+                y = spacer_y + 1 + idx
+                display = label[:box_w - 6] if len(label) > box_w - 6 else label
+
+                if idx == selected_row:
+                    stdscr.addstr(y, start_x + 1, " " * (box_w - 2), cp_sel)
+                    stdscr.addstr(y, start_x + 2, "▸ " + display, cp_sel)
+                    stdscr.addstr(y, start_x, "│", cp_border)
+                    stdscr.addstr(y, start_x + box_w - 1, "│", cp_border)
+                else:
+                    stdscr.addstr(y, start_x, "│", cp_border)
+                    stdscr.addstr(y, start_x + 2, "  " + display)
+                    stdscr.addstr(y, start_x + box_w - 1, "│", cp_border)
+
+            footer = "↑↓ Navigate  ↵ Select  Q Quit"
+            m = box_w - 2 - len(footer)
+            fl = m // 2
+            fr = m - fl
+            stdscr.addstr(start_y + box_h - 1, start_x, "└" + "─" * fl + footer + "─" * fr + "┘", cp_border)
         except curses.error:
             pass
 
         stdscr.refresh()
 
     def run_curses_menu(stdscr, options):
+        init_curses_colors()
         curses.curs_set(0)
         stdscr.clear()
         stdscr.nodelay(True)
@@ -263,11 +468,7 @@ if CURSES_AVAILABLE:
     def curses_main(stdscr):
         global CURSES_FAILED
         try:
-            run_outside_curses(stdscr, print_banner)
-            run_outside_curses(stdscr, print, GREEN + "Hello there, I am bAsIc." + RESET)
-            name = run_outside_curses(stdscr, input, "What's your name? - ").strip()
-            run_outside_curses(stdscr, print, GREEN + "Okay, your name is " + name + RESET)
-            run_outside_curses(stdscr, print)
+            name = run_outside_curses(stdscr, boot_splash_and_get_name)
 
             jokes = ["Why did the computer show up at work late? It had a hard drive.", "There are 10 kinds of people in the world: those who understand binary and those who don't.", "I would tell you a UDP joke, but you might not get it."]
             compliments = ["You are doing great!", "You are smarter than you think.", "The world is better with you in it, " + name + "."]
@@ -280,8 +481,9 @@ if CURSES_AVAILABLE:
                 if choice == "quit":
                     break
                 elif choice == "type":
-                    userask = run_outside_curses(stdscr, input, "Ask me something - ")
+                    userask = run_outside_curses(stdscr, styled_input, "Ask me something")
                     userask_normalized = normalize(userask)
+                    run_outside_curses(stdscr, thinking_animation, 0.7)
                     should_exit = run_outside_curses(
                         stdscr, process_userask, userask_normalized, jokes, kick_out_words
                     )
@@ -299,13 +501,18 @@ def text_menu_select(options, jokes, compliments, quotes):
     selected = 0
     while True:
         print("\033[H\033[J", end="")
-        print("\n" + "=" * 30)
-        print("        bAsIc Menu")
-        print("=" * 30)
+        print(LIGHT_BLUE + "┌" + "─" * 36 + "┐" + RESET)
+        print(LIGHT_BLUE + "│" + " " * 12 + CYAN + "bAsIc Menu" + " " * 12 + LIGHT_BLUE + "│" + RESET)
+        print(LIGHT_BLUE + "├" + "─" * 36 + "┤" + RESET)
         for idx, (label, _) in enumerate(options):
-            marker = ">" if idx == selected else " "
-            print(f"  {marker} {label}")
-        print("=" * 30 + "\n")
+            display = label[:34] if len(label) > 34 else label
+            pad = 36 - len(display)
+            if idx == selected:
+                print(GREEN + "│" + " " + "▸ " + display + " " * (pad - 2) + "│" + RESET)
+            else:
+                print("│" + "  " + display + " " * (pad - 2) + "│")
+        print(LIGHT_BLUE + "└" + "─" * 36 + "┘" + RESET)
+        print(CYAN + "  ↑↓ Navigate  ↵ Select  Q Quit" + RESET)
 
         if sys.platform != "win32":
             try:
@@ -356,7 +563,7 @@ def main():
     if CURSES_AVAILABLE and not CURSES_FAILED:
         try:
             curses.wrapper(curses_main)
-            print(YELLOW + "Goodbye!" + RESET)
+            ai_print(YELLOW + "Goodbye!" + RESET)
             return
         except Exception as e:
             CURSES_FAILED = True
@@ -364,12 +571,9 @@ def main():
                 curses.endwin()
             except:
                 pass
-            print(YELLOW + f"Could not use curses menu: {e}" + RESET)
-            print(YELLOW + "Falling back to text menu..." + RESET)
+            ai_print(YELLOW + f"Could not use curses menu. Falling back to text menu..." + RESET)
 
-    print(GREEN + "Hello there, I am bAsIc." + RESET)
-    name = input("What's your name? - ").strip()
-    print(GREEN + "Okay, your name is " + name + RESET)
+    name = boot_splash_and_get_name()
 
     jokes = ["Why did the computer show up at work late? It had a hard drive.", "There are 10 kinds of people in the world: those who understand binary and those who don't.", "I would tell you a UDP joke, but you might not get it."]
     compliments = ["You are doing great!", "You are smarter than you think.", "The world is better with you in it, " + name + "."]
@@ -396,21 +600,22 @@ def main():
         while True:
             choice = text_menu_select(MENU_OPTIONS, jokes, compliments, quotes)
             if choice == "type":
-                userask = input("Ask me something - ")
+                userask = styled_input("Ask me something")
                 userask_normalized = normalize(userask)
+                thinking_animation(0.7)
                 should_exit = process_userask(userask_normalized, jokes, kick_out_words)
                 if should_exit:
                     return
                 continue
             done = handle_choice(choice, name, jokes, compliments, quotes)
             if done:
-                print(YELLOW + "Goodbye!" + RESET)
+                ai_print(YELLOW + "Goodbye!" + RESET)
                 break
         return
 
     last_response_type = ""
     while True:
-        userask = input("Ask me something - ")
+        userask = styled_input("Ask me something")
         userask_normalized = normalize(userask)
 
         if userask_normalized in context_triggers:
@@ -437,10 +642,7 @@ def main():
             ai_print(YELLOW + "Goodbye!" + RESET)
             break
         elif userask_normalized == "/help" or userask_normalized == "help":
-            ai_print("I can perform calculations by calculator mode.")
-            ai_print("I can do basic communication.")
-            ai_print("I also have some hidden secrets.")
-            ai_print("I am age friendly and prevent bad things.")
+            ai_print("I can perform calculations. I can do basic communication. I also have hidden secrets. I am age friendly.")
             continue
 
         if contains_any(userask_normalized, symbols_to_check):

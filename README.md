@@ -58,7 +58,7 @@ Originally created by **Herbert Kumar** as a tiny experiment in building a “ba
 
 You should see the ASCII-art logo, then be prompted for your name, followed by:
 
-> `Hello There, I am an bAsIc.`
+> `Hello There, I am bAsIc.`
 
 ### How to talk to bAsIc
 

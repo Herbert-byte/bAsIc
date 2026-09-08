@@ -1,1 +1,8 @@
-# Python standard library only; no external dependencies.
+# bAsIc — cross-platform requirements
+# Core: Python 3.8+ stdlib only on Linux / macOS
+# Windows: curses is provided by windows-curses (required for ncurses menu)
+# Install with: pip install -r requirements.txt
+
+# Linux / macOS: no extra deps (curses is in stdlib)
+# Windows:
+windows-curses>=2.3.0; sys_platform == "win32"
